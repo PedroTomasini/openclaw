@@ -1,94 +1,84 @@
 # 🚀 Deploy no Railway - Guia Rápido
 
-## 1. Gerar o Gateway Token
+Baseado na documentação oficial: https://docs.openclaw.ai/install/railway
 
-```bash
-openssl rand -hex 32
-```
+## 1. Configurar no Railway Dashboard
 
-Copie o resultado (64 caracteres hexadecimais).
+### Variáveis de Ambiente (Obrigatórias)
 
-## 2. Obter API Key do Moonshot
+| Variável | Valor | Descrição |
+|----------|-------|-----------|
+| `PORT` | `8080` | Porta do serviço |
+| `NODE_ENV` | `production` | Ambiente de produção |
+| `SETUP_PASSWORD` | `<senha_segura>` | Senha para acessar o wizard de setup |
+| `OPENCLAW_STATE_DIR` | `/data/.openclaw` | Diretório de estado |
+| `OPENCLAW_WORKSPACE_DIR` | `/data/workspace` | Diretório de workspace |
+| `OPENCLAW_PREFER_PNPM` | `1` | Forçar uso do pnpm |
 
-1. Acesse: https://platform.moonshot.ai
-2. Crie uma conta
-3. Gere uma API Key
-4. A chave começa com `sk-`
+### Passos:
 
-## 3. Configurar no Railway
-
-### Opção A: Importar arquivo
-1. No Railway, vá em **Variables**
+1. **No Railway, vá em Variables**
 2. Clique em **Raw Editor**
 3. Cole o conteúdo do arquivo `railway.env`
-4. Substitua `CHANGE_ME` pelos valores reais
+4. Substitua `CHANGE_ME` por uma senha segura para `SETUP_PASSWORD`
 
-### Opção B: Adicionar uma a uma
-| Variável | Valor |
-|----------|-------|
-| `PORT` | `8080` |
-| `NODE_ENV` | `production` |
-| `OPENCLAW_GATEWAY_TOKEN` | `<token_gerado_no_passo_1>` |
-| `MOONSHOT_API_KEY` | `sk-<sua_chave_moonshot>` |
-| `OPENCLAW_STATE_DIR` | `/data/.openclaw` |
-| `OPENCLAW_WORKSPACE_DIR` | `/data/workspace` |
-| `OPENCLAW_PREFER_PNPM` | `1` |
-
-## 4. Adicionar Volume (Persistência)
+## 2. Adicionar Volume (Persistência)
 
 1. Vá em **Settings** → **Volumes**
 2. **Mount Path**: `/data`
 3. **Size**: 1GB (ou mais se necessário)
 
-## 5. Deploy
+## 3. Configurar Rede Pública
+
+1. Vá em **Settings** → **Networking**
+2. Ative **HTTP Proxy**
+3. Port: `8080`
+
+## 4. Deploy
 
 O deploy acontece automaticamente quando você conecta o repositório!
 
-## 6. Verificar se funcionou
+## 5. Configurar via Web Wizard
 
-Acesse: `https://<seu-projeto>.up.railway.app/health`
+Após o deploy, acesse:
 
-Deve retornar: `{"status":"ok"}`
-
----
-
-## 📝 Modelos Kimi Disponíveis
-
-Com a configuração acima, você terá acesso a:
-
-- `moonshot/kimi-k2.5` (padrão)
-- `moonshot/kimi-k2-0905-preview`
-- `moonshot/kimi-k2-turbo-preview`
-- `moonshot/kimi-k2-thinking`
-- `moonshot/kimi-k2-thinking-turbo`
-
-## 🔧 Configurar Cliente Local
-
-Após o deploy, configure seu cliente OpenClaw:
-
-```bash
-openclaw config set gateway.url=https://<seu-projeto>.up.railway.app
-openclaw config set gateway.token=<OPENCLAW_GATEWAY_TOKEN>
+```
+https://<seu-projeto>.up.railway.app/setup
 ```
 
-Ou use diretamente:
+1. Digite sua `SETUP_PASSWORD`
+2. Escolha um provider de modelo (OpenAI, Anthropic, etc.) e cole sua API key
+3. (Opcional) Adicione tokens de Telegram/Discord/Slack
+4. Clique em **Run setup**
 
-```bash
-openclaw agent --gateway https://<seu-projeto>.up.railway.app --message "Olá!"
+## 6. Acessar o Control UI
+
 ```
+https://<seu-projeto>.up.railway.app/openclaw
+```
+
+## 7. Backup e Migração
+
+Para exportar seus dados:
+
+```
+https://<seu-projeto>.up.railway.app/setup/export
+```
+
+Isso permite migrar para outro host sem perder configurações ou memória.
 
 ---
 
 ## 🆘 Troubleshooting
 
-**Erro: "Unauthorized"**
-→ Verifique se `OPENCLAW_GATEWAY_TOKEN` está correto
-
-**Erro: "No model provider configured"**
-→ Verifique se `MOONSHOT_API_KEY` está preenchida corretamente
+**Erro de permissão no /data**
+→ Verifique se o volume está montado corretamente em `/data`
 
 **Container reiniciando**
 → Verifique os logs no Railway Dashboard → Deployments → Logs
+
+**Não consegue acessar /setup**
+→ Verifique se `SETUP_PASSWORD` está configurado
 
 **Dados perdidos após restart**
 → Verifique se o volume em `/data` está configurado
