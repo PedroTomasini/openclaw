@@ -30,6 +30,8 @@ coverage
 *.log
 tmp
 **/tmp
+.env
+**/.env
 
 # build artifacts
 dist
