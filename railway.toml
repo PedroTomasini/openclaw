@@ -1,0 +1,15 @@
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+startCommand = "node openclaw.mjs gateway --allow-unconfigured --bind lan --port ${PORT:-8080}"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[deploy.env]
+NODE_ENV = "production"
+OPENCLAW_PREFER_PNPM = "1"
+OPENCLAW_STATE_DIR = "/data/.openclaw"
+OPENCLAW_WORKSPACE_DIR = "/data/workspace"
