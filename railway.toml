@@ -2,7 +2,7 @@
 builder = "DOCKERFILE"
 
 [deploy]
-startCommand = "node openclaw.mjs gateway --allow-unconfigured --bind lan --port ${PORT:-8080}"
+startCommand = "mkdir -p /data/.openclaw /data/workspace && chown -R node:node /data && exec su -s /bin/sh node -c 'node openclaw.mjs gateway --allow-unconfigured --bind lan --port '\"${PORT:-8080}\"''"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
